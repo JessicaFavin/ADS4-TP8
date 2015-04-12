@@ -1,0 +1,9 @@
+VAR x;
+VAR y;
+VAR z;
+PRINT 1;
+FOR (10 + x) TIMES {
+	PRINT 2;
+	y = 10;
+	z = (x + y);
+}
