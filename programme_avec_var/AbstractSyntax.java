@@ -1,19 +1,25 @@
 import java.util.*;
 
 abstract class Expression {
-/*    abstract int eval(ValueEnvironment env)
-    throws Exception; */
+    abstract int eval(ValueEnvironment env)
+    throws Exception; 
 }
 class Int extends Expression {
 	private int value;
 	public Int(int i) {
 		value = i;
 	}
+	public int eval(ValueEnvironment env) throws Exception {
+		return value;
+	}
 }
 class Var extends Expression {
 	private String name;
 	public Var(String s) {
 		name = s;
+	}
+	public int eval(ValueEnvironment env) throws Exception {
+		return env.getValue(name);
 	}
 }
 class Sum extends Expression {
@@ -22,12 +28,18 @@ class Sum extends Expression {
 		left = l;
 		right = r;
 	}
+	public int eval(ValueEnvironment env) throws Exception {
+		return left.eval(env)+right.eval(env);
+	}
 }
 class Difference extends Expression {
 	private Expression left, right;
-	public Difference(Expression l, Expression r) {
+	public Difference(Expression l, Expression r) throws Exception {
 		left = l;
 		right = r;
+	}
+	public int eval(ValueEnvironment env) throws Exception{
+		return left.eval(env)-right.eval(env);
 	}
 }
 class Product extends Expression {
@@ -36,12 +48,18 @@ class Product extends Expression {
 		left = l;
 		right = r;
 	}
+	public int eval(ValueEnvironment env) throws Exception {
+		return left.eval(env)*right.eval(env);
+	}
 }
 class Division extends Expression {
 	private Expression left, right;
 	public Division(Expression l, Expression r) {
 		left = l;
 		right = r;
+	}
+	public int eval(ValueEnvironment env) throws Exception {
+		return left.eval(env)/right.eval(env);
 	}
 }
 
@@ -56,7 +74,9 @@ class Program {
 	throws Exception {
 		if (first != null) {
 			first.exec(env);
-			rest.run(env);
+			if(rest != null){
+				rest.run(env);
+			}
 		}
 	} 
 }
@@ -72,7 +92,11 @@ class Declaration extends Instruction {
 	}
 	public void exec(ValueEnvironment env) 
 	throws Exception {
-		// Complétez ici...
+		try{
+			env.addVariable(varName);
+		} catch(Exception e) {
+			throw new Exception();
+		}
 	} 
 }
 class Assignment extends Instruction {
@@ -84,7 +108,11 @@ class Assignment extends Instruction {
 	}
 	public void exec(ValueEnvironment env)
 	throws Exception {
-		// Complétez ici...
+		try{
+			env.setVariable(varName, exp.eval(env));
+		} catch(Exception e) {
+			throw new Exception();
+		}
 	}
 }
 class Print extends Instruction {
@@ -94,7 +122,11 @@ class Print extends Instruction {
 	}
 	public void exec(ValueEnvironment env) 
 	throws Exception {
-		// Complétez ici...
+		try{
+			System.out.println(exp.eval(env));
+		} catch(Exception e) {
+			throw new Exception();
+		}
 	}
 }
 class Loop extends Instruction {
@@ -106,25 +138,26 @@ class Loop extends Instruction {
 	}
 	public void exec(ValueEnvironment env)
 	throws Exception {
-		// Complétez ici...
+		for(int i=0; i<exp.eval(env); i++){
+			prog.run(env);
+		}
 	}
 }
 
 class ValueEnvironment extends HashMap<String, Integer> {
 	public ValueEnvironment() {
-		// Completez ici...
+		super();
 	}
 	public void addVariable(String name) 
 	throws Exception {
-		// Completez ici...
+		this.put(name, 0);
 	}
 	public void setVariable(String name, int value) 
 	throws Exception {
-		// Completez ici...
+		this.put(name, value);
 	}
 	public int getValue(String name) 
 	throws Exception {
-		// Completez ici...
-		return 0;
+		return this.get(name);
 	}
 }

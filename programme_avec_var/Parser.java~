@@ -10,20 +10,26 @@ class Parser {
      * ExpSuite -> + Exp | - Exp | * Exp | / Exp
 	 */
     protected LookAhead1 reader;
+    protected ValueEnvironment variables;
 
     public Parser(LookAhead1 r) {
-	   reader=r;
+	   reader = r;
+	   variables = new ValueEnvironment();
     }
 
-    public Program nontermCode() 
-    throws Exception {
+    public Program nontermCode() throws Exception {
         Program prog = nontermProg();
         reader.eat(Sym.EOF);
         return prog;
     }
+    
+    public ValueEnvironment getVariables(){
+    	return this.variables;
+    }
 
-	public Program nontermProg() throws Exception(){
-		if(reader.check(Sym.VAR)||reader.check(Sym.VARIABLE)||reader.check(Sym.PRINT)||reader.check(Sym.FOR)){
+	public Program nontermProg() throws Exception {
+		if(reader.check(Sym.VAR)||reader.check(Sym.VARIABLE)||
+			reader.check(Sym.PRINT)||reader.check(Sym.FOR)){
 			Instruction instr = nontermInstr();
 			Program prog = nontermProg();
 			return new Program(instr, prog);
@@ -33,26 +39,28 @@ class Parser {
 	}
 	
 	//Inst -> VAR var; | var = Exp; | PRINT Exp; | FOR Exp TIMESDO {Prog}
-	public Instruction nontermInstr(){
+	public Instruction nontermInstr() throws Exception {
 		if(reader.check(Sym.VAR)){
 			term(Sym.VAR);
-			String nomVar = reader.getValue();
+			String nomVar = reader.getStringValue();
 			term(Sym.VARIABLE);
 			term(Sym.CONCAT);
+			variables.addVariable(nomVar);
 			return new Declaration(nomVar);
 			
 		} else if(reader.check(Sym.VARIABLE)) {
-			String nomVar = reader.getValue();
+			String nomVar = reader.getStringValue();
 			term(Sym.VARIABLE);
 			term(Sym.EQ);
 			Expression exp = nontermExp();
 			term(Sym.CONCAT);
-			return new Assignement(nomVar, exp);
+			variables.setVariable(nomVar, exp.eval());
+			return new Assignment(nomVar, exp);
 		} else if(reader.check(Sym.PRINT)) {
 			term(Sym.PRINT);
 			Expression exp = nontermExp();
 			term(Sym.CONCAT);
-			return Print(exp);
+			return new Print(exp);
 		} else if(reader.check(Sym.FOR)) {
 			term(Sym.FOR);
 			Expression exp = nontermExp();
@@ -60,7 +68,7 @@ class Parser {
 			term(Sym.LACC);
 			Program prog = nontermProg();
 			term(Sym.RACC);
-			return Loop(exp, prog);
+			return new Loop(exp, prog);
 		} else {
 			throw new Exception();
 		}
@@ -74,11 +82,11 @@ class Parser {
 			term(Sym.RPAR);
 			return expSuite;
 		} else if(reader.check(Sym.INT)){
-			int value = reader.getValue();
+			int value = reader.getIntValue();
 			term(Sym.INT);
 			return new Int(value);
 		} else if(reader.check(Sym.VARIABLE)){
-			String var = reader.getValue();
+			String var = reader.getStringValue();
 			term(Sym.VARIABLE);
 			return new Var(var);
 		} else {

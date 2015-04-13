@@ -1,0 +1,8 @@
+VAR x;
+VAR y;
+y = 1;
+FOR 10 TIMES {
+x = (x+1);
+y = (y*x);
+PRINT y;
+}

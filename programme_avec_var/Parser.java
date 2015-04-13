@@ -12,7 +12,7 @@ class Parser {
     protected LookAhead1 reader;
 
     public Parser(LookAhead1 r) {
-	   reader=r;
+	   reader = r;
     }
 
     public Program nontermCode() throws Exception {

@@ -5,6 +5,6 @@ PRINT 1;
 FOR (10 + x) TIMES {
 	PRINT 2;
 	y = 10;
-	z = (z + y);
+	z = (x + y);
 	PRINT z;
 }
