@@ -1,0 +1,20 @@
+public enum Sym {
+	VAR,
+	VARIABLE,
+	INT,
+	CONCAT,
+	LPAR,
+	RPAR,
+	DEBUT,
+	FIN,
+	EOF,
+	EQ,
+	PLUS,
+	MINUS,
+	TIMES,
+	DIV,
+	HAUT,
+	BAS,
+	TOURNE,
+	AVANCE;
+}

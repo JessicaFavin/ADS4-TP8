@@ -1,0 +1,46 @@
+%%
+%public
+%class Lexer
+%unicode
+%type Token
+%line
+%column
+
+%{
+	
+%}
+
+%yylexthrow{
+	LexerException
+%yylexthrow}
+
+blank = "\n" | "\r" | " " | "\t"
+int   = [1-9][0-9]* | 0
+variable = [a-z][a-zA-Z]*
+
+%%
+
+<YYINITIAL> {
+   
+ "("			{return new Token(Sym.LPAR);}
+ ")"			{return new Token(Sym.RPAR);}
+ "VAR"			{return new Token(Sym.VAR);}
+ "DEBUT"		{return new Token(Sym.DEBUT);}
+ "FIN"			{return new Token(Sym.FIN);}
+ "HAUTPINCEAU"	{return new Token(Sym.HAUT);}
+ "BASPINCEAU"	{return new Token(Sym.BAS);}
+ "TOURNE"		{return new Token(Sym.TOURNE);}
+ "AVANCE"		{return new Token(Sym.AVANCE);}
+ "="			{return new Token(Sym.EQ);}
+ ";"			{return new Token(Sym.CONCAT);}
+ "+"			{return new Token(Sym.PLUS);}
+ "-"			{return new Token(Sym.MINUS);}
+ "*"			{return new Token(Sym.TIMES);}
+ "/"			{return new Token(Sym.DIV);}
+ {variable}		{return new VarToken(Sym.VARIABLE, yytext());}
+ {int}			{return new IntToken(Sym.INT, Integer.parseInt(yytext()));}
+   
+ {blank}	   	{}
+ <<EOF>>	   	{return new Token(Sym.EOF);}
+ [^]		   	{throw new LexerException(yyline, yycolumn);}
+}
