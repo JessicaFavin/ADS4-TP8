@@ -8,7 +8,7 @@ class Parser {
      * Decl -> VAR var; Decl | e
      * Inst -> var = Exp; | DEBUT BlocInst FIN | AVANCE Exp; | TOURNE Exp; | HAUTPINCEAU; | BASPINCEAU;
      *  | COULEUR Exp; | EPAISSEUR Exp; | SI Exp ALORS Inst SINON Inst | TANT QUE Exp FAIRE Inst
-     * BlocInst -> Inst; BlocInst | e
+     * BlocInst -> Inst BlocInst | e
 	 * Exp -> int ExpSuite | var ExpSuite | (Exp) ExpSuite
 	 * ExpSuite -> Op ExpSuite | e
      * Op -> + Exp | - Exp | * Exp | / Exp
