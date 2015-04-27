@@ -18,7 +18,7 @@ class Var extends Expression {
 	public Var(String s) {
 		name = s;
 	}
-	public int eval(ValueEnvironment env) throws Exception {
+	public double eval(ValueEnvironment env) throws Exception {
 		return env.getValue(name);
 	}
 }
@@ -132,8 +132,8 @@ class Turn extends Instruction {
 		exp = e;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		dp.setAngle(exp.eval(env));
-		dp.turnAngle();
+		//dp.setAngle();
+		dp.turnAngle(exp.eval(env));
 	}
 }
 
@@ -158,6 +158,20 @@ class Size extends Instruction {
 	}
 }
 
+class If extends Instruction {
+	private Expression exp;
+	private Instruction inst;
+	public If(Expression e, Instruction i){
+		exp=e;
+		inst=i;
+	}
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
+		if(exp.eval(env)==0){
+			inst.exec(env, dp);
+		}
+	}
+}
+
 class IfElse extends Instruction {
 	private Expression exp;
 	private Instruction inst;
@@ -176,6 +190,24 @@ class IfElse extends Instruction {
 	}
 }
 
+class For extends Instruction {
+	private Expression exp;
+	private Instruction inst;
+	public For(Expression e, Instruction i){
+		exp=e;
+		inst=i;
+	}
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
+		if(exp.eval(env)>0){
+			for(int i=0; i<exp.eval(env); i++){
+				inst.exec(env, dp);
+			}
+		} else {
+			throw new Exception("Condition de boucle POUR non valide (inférieure ou égale à 0)");
+		}
+	}
+}
+
 class While extends Instruction {
 	private Expression exp;
 	private Instruction inst;
@@ -184,7 +216,7 @@ class While extends Instruction {
 		inst=i;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		while(exp.eval(env)==0){
+		while(exp.eval(env)!=0){
 			inst.exec(env, dp);
 		}
 	}
@@ -234,19 +266,19 @@ class BlocDecl{
 	}
 }
 
-class ValueEnvironment extends HashMap<String, Integer> {
+class ValueEnvironment extends HashMap<String, Double> {
 	public ValueEnvironment() {
 		super();
 	}
 	public void addVariable(String name) 
 	throws Exception {
-		this.put(name, 0);
+		this.put(name, 0.0);
 	}
-	public void setVariable(String name, int value) 
+	public void setVariable(String name, double value) 
 	throws Exception {
 		this.put(name, value);
 	}
-	public int getValue(String name) 
+	public double getValue(String name) 
 	throws Exception {
 		return this.get(name);
 	}

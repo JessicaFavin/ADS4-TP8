@@ -1,0 +1,22 @@
+VAR angle;
+VAR x;
+VAR couleur;
+DEBUT
+x = (45/4);
+angle = 0-x;
+couleur = 9;
+COULEUR couleur;
+AVANCE 200;
+TOURNE 0-90;
+AVANCE 200;
+TOURNE 90;
+BASPINCEAU;
+POUR 66 TOURS
+DEBUT
+AVANCE 30;
+TOURNE angle;
+couleur = couleur-1;
+SI couleur ALORS couleur = 9;
+COULEUR couleur;
+FIN
+FIN

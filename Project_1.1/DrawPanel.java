@@ -111,6 +111,12 @@ public class DrawPanel extends JPanel {
 
         System.out.println("Angle : " + angle + " rad");
     }
+    
+    public void turnAngle(double deg){
+    	double rad = Math.toRadians(deg);
+    	angle -= rad;
+    	angle = angle % (2*Math.PI);
+    }
 
     public void pickColor() {
         int rand = ((int) (Math.random() * (9 + 1 - 1)) + 1);

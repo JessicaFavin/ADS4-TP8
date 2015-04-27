@@ -132,8 +132,8 @@ class Turn extends Instruction {
 		exp = e;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		dp.setAngle(exp.eval(env));
-		dp.turnAngle();
+		//dp.setAngle();
+		dp.turnAngle(exp.eval(env));
 	}
 }
 
@@ -165,9 +165,9 @@ class If extends Instruction {
 		exp=e;
 		inst=i;
 	}
-	public void exec(ValueEnvironment env, DrawPanel dp) throwsException {
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		if(exp.eval(env)==0){
-			inst.exec();
+			inst.exec(env, dp);
 		}
 	}
 }
@@ -197,10 +197,10 @@ class For extends Instruction {
 		exp=e;
 		inst=i;
 	}
-	public void exec(ValueEnvironment env, DrawPanel dp) throwsException {
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		if(exp.eval(env)>0){
 			for(int i=0; i<exp.eval(env); i++){
-				inst.exec();
+				inst.exec(env, dp);
 			}
 		} else {
 			throw new Exception("Condition de boucle POUR non valide (inférieure ou égale à 0)");

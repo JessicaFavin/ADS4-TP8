@@ -7,8 +7,9 @@ class Parser {
      * Prog -> Decl Inst
      * Decl -> VAR var; Decl | e
      * Inst -> var = Exp; | DEBUT BlocInst FIN | AVANCE Exp; | TOURNE Exp; | HAUTPINCEAU; | BASPINCEAU;
-     *  | COULEUR Exp; | EPAISSEUR Exp; | SI Exp ALORS Inst SINON Inst | TANT QUE Exp FAIRE Inst
-     * BlocInst -> Inst; BlocInst | e
+     *  | COULEUR Exp; | EPAISSEUR Exp; | SI Exp ALORS Inst InstSuite | TANT QUE Exp FAIRE Inst  | POUR Exp TOURS Inst
+     * InstSuite -> SINON Inst | e
+     * BlocInst -> Inst BlocInst | e
 	 * Exp -> int ExpSuite | var ExpSuite | (Exp) ExpSuite
 	 * ExpSuite -> Op ExpSuite | e
      * Op -> + Exp | - Exp | * Exp | / Exp
@@ -103,17 +104,38 @@ class Parser {
     		Expression exp = nontermExp();
     		term(Sym.ALORS);
     		Instruction inst = nontermInst();
-    		term(Sym.SINON);
-    		Instruction alt = nontermInst();
-    		return new IfElse(exp, inst, alt);
+    		return nontermInstSuite(exp, inst);
     	} else if(reader.check(Sym.TANTQUE)){
     		term(Sym.TANTQUE);
     		Expression exp = nontermExp();
     		term(Sym.FAIRE);
     		Instruction inst = nontermInst();
     		return new While(exp, inst);
+    	} else if(reader.check(Sym.POUR)){
+			term(Sym.POUR);
+			Expression exp = nontermExp();
+			term(Sym.TOURS);
+			Instruction inst= nontermInst();
+			return new For(exp, inst);
     	} else {
 			throw new ParserException("Erreur Instruction",this.pos);
+    	}
+    }
+
+    public Instruction nontermInstSuite(Expression exp, Instruction inst) throws Exception {
+		if(reader.check(Sym.SINON)) {
+			term(Sym.SINON);
+    		Instruction alt = nontermInst();
+    		return new IfElse(exp, inst, alt);
+		} else if(reader.check(Sym.VARIABLE)||reader.check(Sym.DEBUT)||
+    	reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||
+    	reader.check(Sym.HAUT)||reader.check(Sym.BAS)
+    	||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)
+    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)||reader.check(Sym.POUR)
+    	||reader.check(Sym.EOF)){
+			return new If(exp, inst);
+    	} else {
+			throw new ParserException("Erreur InstructionSuite", this.pos);
     	}
     }
 
@@ -123,7 +145,7 @@ class Parser {
     	reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||
     	reader.check(Sym.HAUT)||reader.check(Sym.BAS)
     	||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)
-    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)){
+    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)||reader.check(Sym.POUR)){
 			Instruction inst = nontermInst();
 			BlocInst bloc = nontermBlocInst();
 			return new BlocInst(inst, bloc);
@@ -152,6 +174,7 @@ class Parser {
 			term(Sym.LPAR);
 			Expression exp = nontermExp();
 			term(Sym.RPAR);
+			System.out.println("Flag");
 			//Specificité parenthèses??
 			Expression expSuite = nontermExpS(exp);
 			return expSuite;
@@ -166,7 +189,7 @@ class Parser {
 			Expression exp = nontermOp(beginning);
 			Expression exp2 = nontermExpS(exp);
 			return exp2;
-		} else if(reader.check(Sym.CONCAT)) {
+		} else if(reader.check(Sym.CONCAT)||reader.check(Sym.ALORS)||reader.check(Sym.FAIRE)||reader.check(Sym.TOURS)) {
 		//in case of FOLLOW(ExpS) ie ExpS=e
 			return beginning;
 		} else {

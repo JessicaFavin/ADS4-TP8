@@ -111,6 +111,12 @@ public class DrawPanel extends JPanel {
 
         System.out.println("Angle : " + angle + " rad");
     }
+    
+    public void turnAngle(int deg){
+    	double rad = Math.toRadians(deg);
+    	angle -= rad;
+    	angle = angle % (2*Math.PI);
+    }
 
     public void pickColor() {
         int rand = ((int) (Math.random() * (9 + 1 - 1)) + 1);
@@ -182,6 +188,44 @@ public class DrawPanel extends JPanel {
     public void setSize(int x) {
         this.size = x;
         p_hb.l_taille.setText(String.valueOf(size) + " px");
+    }
+    
+    public void setColor(int value) {
+        //int rand = ((int) (Math.random() * (9 + 1 - 1)) + 1);
+
+        switch (value) {
+            case 1:
+                color = Color.BLACK;
+                break;
+            case 2:
+                color = Color.CYAN;
+                break;
+            case 3:
+                color = Color.GRAY;
+                break;
+            case 4:
+                color = Color.GREEN;
+                break;
+            case 5:
+                color = Color.MAGENTA;
+                break;
+            case 6:
+                color = Color.ORANGE;
+                break;
+            case 7:
+                color = Color.RED;
+                break;
+            case 8:
+                color = Color.YELLOW;
+                break;
+            case 9:
+                color = Color.BLUE;
+                break;
+            default:
+                color = Color.BLUE;
+                break;
+        }
+        p_hb.p_color.setBackground(color);
     }
 
 }
