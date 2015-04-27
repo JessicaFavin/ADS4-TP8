@@ -10,21 +10,15 @@ class Parser {
      * ExpSuite -> + Exp | - Exp | * Exp | / Exp
 	 */
     protected LookAhead1 reader;
-    protected ValueEnvironment variables;
 
     public Parser(LookAhead1 r) {
 	   reader = r;
-	   variables = new ValueEnvironment();
     }
 
     public Program nontermCode() throws Exception {
         Program prog = nontermProg();
         reader.eat(Sym.EOF);
         return prog;
-    }
-    
-    public ValueEnvironment getVariables(){
-    	return this.variables;
     }
 
 	public Program nontermProg() throws Exception {
@@ -34,7 +28,12 @@ class Parser {
 			Program prog = nontermProg();
 			return new Program(instr, prog);
 		} else {
-			return null;
+			//return null;
+			if(reader.check(Sym.EOF)||reader.check(Sym.RACC)){
+				return null;
+			} else {
+				throw new Exception();
+			}
 		}
 	}
 	
@@ -45,7 +44,6 @@ class Parser {
 			String nomVar = reader.getStringValue();
 			term(Sym.VARIABLE);
 			term(Sym.CONCAT);
-			variables.addVariable(nomVar);
 			return new Declaration(nomVar);
 			
 		} else if(reader.check(Sym.VARIABLE)) {
@@ -54,7 +52,6 @@ class Parser {
 			term(Sym.EQ);
 			Expression exp = nontermExp();
 			term(Sym.CONCAT);
-			variables.setVariable(nomVar, exp.eval());
 			return new Assignment(nomVar, exp);
 		} else if(reader.check(Sym.PRINT)) {
 			term(Sym.PRINT);

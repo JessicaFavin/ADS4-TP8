@@ -28,7 +28,11 @@ class Parser {
 			Program prog = nontermProg();
 			return new Program(instr, prog);
 		} else {
-			return null;
+			if(reader.check(Sym.EOF)||reader.check(Sym.RACC)){
+				return null;
+			} else {
+				throw new Exception();
+			}
 		}
 	}
 	
