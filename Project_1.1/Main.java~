@@ -24,17 +24,24 @@ class Main {
         Parser parser = new Parser(look);
         try {
         	Program prog = parser.nontermCode();
-        	System.out.println("The code is correct");
+        	
         	ValueEnvironment env = new ValueEnvironment();
             Frame fenetre = new Frame();
             fenetre.setVisible(false);
-            prog.run(env, fenetre.p_draw);
+            try{
+            	prog.run(env, fenetre.p_draw);
+            } catch(Exception e){
+            	System.out.println(e.toString());
+            	fenetre.dispose();
+            }
+            System.out.println("The code is correct");
             fenetre.p_draw.takePicture(fenetre.p_draw);
-            .dispose();
+            fenetre.dispose();
         }
         catch (Exception e){
         	System.out.println("The code is not correct.");
-        	System.out.println(e);
+        	System.out.println(e.getLocalizedMessage());
+        	fenetre.dispose();
         }
 
     }

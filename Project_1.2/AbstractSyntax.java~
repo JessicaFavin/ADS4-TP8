@@ -60,7 +60,12 @@ class Division extends Expression {
 	}
 	public double eval(ValueEnvironment env) throws Exception {
 		//Division par 0
-		return left.eval(env)/right.eval(env);
+		if(right.eval(env)==0){
+			System.out.println("POOP");
+			throw new Exception("Erreur division par 0!!");
+		} else {
+			return left.eval(env)/right.eval(env);
+		}
 	}
 }
 
@@ -155,7 +160,7 @@ class Size extends Instruction {
 		exp = e;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		dp.setSize(exp.eval(env));
+		dp.setSize((int)exp.eval(env));
 	}
 }
 

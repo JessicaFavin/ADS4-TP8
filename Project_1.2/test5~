@@ -1,8 +1,10 @@
 VAR angle;
 VAR x;
+VAR test;
 VAR couleur;
 DEBUT
-x = 11.25;
+test = 1-1;
+x = 11.25/test;
 angle = 0-x;
 couleur = 9;
 COULEUR couleur;
@@ -11,9 +13,9 @@ TOURNE 0-90;
 AVANCE 200;
 TOURNE 90;
 BASPINCEAU;
-POUR 32 TOURS
+POUR 32*2 TOURS
 DEBUT
-AVANCE 50;
+AVANCE 25;
 TOURNE angle;
 couleur = couleur-1;
 SI couleur ALORS couleur = 9;

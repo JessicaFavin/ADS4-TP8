@@ -60,7 +60,12 @@ class Division extends Expression {
 	}
 	public double eval(ValueEnvironment env) throws Exception {
 		//Division par 0
-		return left.eval(env)/right.eval(env);
+		if(right.eval(env)==0){
+			System.out.println("Erreur division par 0!!");
+			throw new Exception("Erreur division par 0!!");
+		} else {
+			return left.eval(env)/right.eval(env);
+		}
 	}
 }
 

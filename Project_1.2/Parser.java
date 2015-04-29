@@ -174,7 +174,6 @@ class Parser {
 			term(Sym.LPAR);
 			Expression exp = nontermExp();
 			term(Sym.RPAR);
-			System.out.println("Flag");
 			//Specificité parenthèses??
 			Expression expSuite = nontermExpS(exp);
 			return expSuite;

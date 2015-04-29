@@ -161,7 +161,7 @@ class Parser {
     //Exp -> int ExpSuite | var ExpSuite | (Exp) ExpSuite
     public Expression nontermExp() throws Exception {
     	if(reader.check(Sym.INT)){
-			int value = reader.getIntValue();
+			double value = reader.getIntValue();
 			term(Sym.INT);
 			Expression suite = nontermExpS(new Int(value));
 			return suite;
