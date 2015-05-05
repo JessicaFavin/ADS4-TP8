@@ -56,5 +56,7 @@ class LookAhead1  {
     public String getString() {
         return current.toString();
     }
+    
+
 
 }

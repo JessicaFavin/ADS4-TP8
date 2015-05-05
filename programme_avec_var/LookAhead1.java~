@@ -26,7 +26,7 @@ class LookAhead1  {
 	    throw new Exception("\nCan't eat "+s+" current being "+current);
 	}
 		//for debug
-		System.out.println(current);
+		//System.out.println(current);
 		
         current=lexer.yylex();
     }
@@ -55,6 +55,10 @@ class LookAhead1  {
 
     public String getString() {
         return current.toString();
+    }
+    
+    public Sym getCurrent(){
+    	return current;
     }
 
 }

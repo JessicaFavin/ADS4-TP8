@@ -3,7 +3,7 @@
  * Project Computer Science L2 Semester 4 - TurtleDraw
  */
 
-
+import java.io.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,6 +44,8 @@ public class ChatPanel extends JPanel {
     private     StyledDocument  sd_chat;
     private     JPanel          p_correct;
     private     JLabel          l_correct;
+    
+    private		String			last;
     
     private     DrawPanel       dp;
     Icon icon = new ImageIcon("src/turtledraw/checked.png");
@@ -87,6 +89,7 @@ public class ChatPanel extends JPanel {
         sd_chat             = tp_chat.getStyledDocument();
         p_north             .setLayout(new BorderLayout());
         this                .setLayout(new BorderLayout());
+        last = "";
         setupChat();
     }
 
@@ -120,13 +123,13 @@ public class ChatPanel extends JPanel {
         tp_chat.setCaretPosition(tp_chat.getText().length());
     }
 
-    private void correctMessage(String str){
+    public void correctMessage(String str){
         l_correct.setText(str);
         p_correct.setBackground(new Color(0, 160, 0));
         l_correct.setForeground(Color.WHITE);
     }
     
-    private void wrongMessage(String str){
+    public void wrongMessage(String str){
         l_correct.setText(str);
         p_correct.setBackground(Color.RED);
         l_correct.setForeground(Color.WHITE);
@@ -141,7 +144,7 @@ public class ChatPanel extends JPanel {
                     if (key == KeyEvent.VK_ENTER) {
                         try {
                             String sentence = tf_sentence.getText();
-                            
+                            //last = sentence;
                             tp_chat.setText(tp_chat.getText()+ " "+sentence+"\n");
                             
                             sd_chat = (StyledDocument)tp_chat.getDocument();
@@ -149,6 +152,20 @@ public class ChatPanel extends JPanel {
                             sd_chat.insertString(sd_chat.getLength(), "ignored text", style);
                             
                             tf_sentence.setText("");
+                            
+                            Reader reader = new StringReader(sentence);
+							Lexer lexer = new Lexer(reader);
+							try{
+								LookAhead1 look = new LookAhead1(lexer);
+								ValueEnvironment env = new ValueEnvironment();
+								try{
+									Parser parser = new Parser(look, env, dp);
+								} catch (Exception ex){
+									wrongMessage("An error occurred");
+								}
+							} catch(Exception exp) {
+								wrongMessage("poop");
+							}
                         } catch (BadLocationException ex) {
                             Logger.getLogger(ChatPanel.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -199,5 +216,9 @@ public class ChatPanel extends JPanel {
                 }
             }
         );
+    }
+    
+    public String getLast(){
+    	return last;
     }
 }

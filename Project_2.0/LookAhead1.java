@@ -32,7 +32,7 @@ class LookAhead1  {
         current=lexer.yylex();
     }
     
-    public int getIntValue()
+    public double getIntValue()
     throws Exception {
     // it gives the value of the IntToken, or it rises an exception if not IntToken
     	if (current instanceof IntToken) {
@@ -56,6 +56,10 @@ class LookAhead1  {
 
     public String getString() {
         return current.toString();
+    }
+    
+    public Sym getCurrent(){
+    	return current.symbol();
     }
 
 }

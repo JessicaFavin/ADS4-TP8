@@ -1,0 +1,8 @@
+VAR angle;
+AVANCE 10;
+DEBUT
+angle = 0-90;
+BASPINCEAU;
+TOURNE angle;
+AVANCE 50;
+FIN

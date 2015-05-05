@@ -14,8 +14,9 @@
 	LexerException
 %yylexthrow}
 
-blank = [\n\r\t ]
-int   = [1-9][0-9]* | 0
+blank = [\t ]
+line = [\n\r\f]
+int   = [1-9][0-9]*[.]*[0-9]* | 0
 variable = [a-z][a-zA-Z]*
 
 %%
@@ -38,6 +39,9 @@ variable = [a-z][a-zA-Z]*
  "SINON"		{return new Token(Sym.SINON);}
  "TANT QUE"		{return new Token(Sym.TANTQUE);}
  "FAIRE"		{return new Token(Sym.FAIRE);}
+ "POUR"			{return new Token(Sym.POUR);}
+ "TOUR"			{return new Token(Sym.TOURS);}
+ "TOURS"		{return new Token(Sym.TOURS);}
  "="			{return new Token(Sym.EQ);}
  ";"			{return new Token(Sym.CONCAT);}
  "+"			{return new Token(Sym.PLUS);}
@@ -45,9 +49,11 @@ variable = [a-z][a-zA-Z]*
  "*"			{return new Token(Sym.TIMES);}
  "/"			{return new Token(Sym.DIV);}
  {variable}		{return new VarToken(Sym.VARIABLE, yytext());}
- {int}			{return new IntToken(Sym.INT, Integer.parseInt(yytext()));}
+ {int}			{return new IntToken(Sym.INT, Double.parseDouble(yytext()));}
    
  {blank}	   	{}
- <<EOF>>	   	{return new Token(Sym.EOF);}
+ 
+ {line}			{return new Token(Sym.EOL);}
+ "STOP"	   		{return new Token(Sym.STOP);}
  [^]		   	{System.out.println(yytext()); throw new LexerException(yyline, yycolumn);}
 }

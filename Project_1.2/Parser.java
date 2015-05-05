@@ -30,7 +30,7 @@ class Parser {
     
     //Prog -> Decl Inst
     public Program nontermProg() throws Exception {
-    	if(reader.check(Sym.VAR)){
+    	if(reader.check(Sym.VAR)||reader.check(Sym.VARIABLE)||reader.check(Sym.DEBUT)||reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||reader.check(Sym.BAS)||reader.check(Sym.HAUT)||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)){
 			BlocDecl decl = nontermDecl();
 			Instruction inst = nontermInst();
 			return new Program(decl, inst);

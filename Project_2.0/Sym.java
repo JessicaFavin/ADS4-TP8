@@ -8,6 +8,8 @@ public enum Sym {
 	DEBUT,
 	FIN,
 	EOF,
+	EOL,
+	STOP,
 	EQ,
 	PLUS,
 	MINUS,
@@ -22,6 +24,8 @@ public enum Sym {
 	SINON,
 	TANTQUE,
 	FAIRE,
+	POUR,
+	TOURS,
 	TOURNE,
 	AVANCE;
 }

@@ -15,12 +15,12 @@ class Token {
 }
 
 class IntToken extends Token {
-	private int value;
-    public IntToken(Sym s, int v){
+	private double value;
+    public IntToken(Sym s, double v){
 		super(s);
 		value=v;
 	}
-	public int getValue(){
+	public double getValue(){
 		return this.value;
 	}
     public String toString(){

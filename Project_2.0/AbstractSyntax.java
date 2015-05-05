@@ -1,15 +1,15 @@
 import java.util.*;
 
 abstract class Expression {
-    abstract int eval(ValueEnvironment env)
+    abstract double eval(ValueEnvironment env, DrawPanel dp)
     throws Exception; 
 }
 class Int extends Expression {
-	private int value;
-	public Int(int i) {
+	private double value;
+	public Int(double i) {
 		value = i;
 	}
-	public int eval(ValueEnvironment env) throws Exception {
+	public double eval(ValueEnvironment env, DrawPanel dp) throws Exception {
 		return value;
 	}
 }
@@ -18,7 +18,7 @@ class Var extends Expression {
 	public Var(String s) {
 		name = s;
 	}
-	public int eval(ValueEnvironment env) throws Exception {
+	public double eval(ValueEnvironment env, DrawPanel dp) throws Exception {
 		return env.getValue(name);
 	}
 }
@@ -28,8 +28,8 @@ class Sum extends Expression {
 		left = l;
 		right = r;
 	}
-	public int eval(ValueEnvironment env) throws Exception {
-		return left.eval(env)+right.eval(env);
+	public double eval(ValueEnvironment env, DrawPanel dp) throws Exception {
+		return left.eval(env, dp)+right.eval(env, dp);
 	}
 }
 class Difference extends Expression {
@@ -38,8 +38,8 @@ class Difference extends Expression {
 		left = l;
 		right = r;
 	}
-	public int eval(ValueEnvironment env) throws Exception{
-		return left.eval(env)-right.eval(env);
+	public double eval(ValueEnvironment env, DrawPanel dp) throws Exception{
+		return left.eval(env, dp)-right.eval(env, dp);
 	}
 }
 class Product extends Expression {
@@ -48,8 +48,8 @@ class Product extends Expression {
 		left = l;
 		right = r;
 	}
-	public int eval(ValueEnvironment env) throws Exception {
-		return left.eval(env)*right.eval(env);
+	public double eval(ValueEnvironment env, DrawPanel dp) throws Exception {
+		return left.eval(env, dp)*right.eval(env, dp);
 	}
 }
 class Division extends Expression {
@@ -58,8 +58,15 @@ class Division extends Expression {
 		left = l;
 		right = r;
 	}
-	public int eval(ValueEnvironment env) throws Exception {
-		return left.eval(env)/right.eval(env);
+	public double eval(ValueEnvironment env, DrawPanel dp) throws Exception {
+		//Division par 0
+		if(right.eval(env, dp)==0){
+			dp.p_cp.wrongMessage("Erreur division par 0!!");
+			throw new Exception("Erreur division par 0!!");
+			
+		} else {
+			return left.eval(env, dp)/right.eval(env, dp);
+		}
 	}
 }
 
@@ -92,10 +99,14 @@ class Declaration extends Instruction {
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) 
 	throws Exception {
-		try{
-			env.addVariable(varName);
-		} catch(Exception e) {
-			throw new Exception();
+		if(env.get(varName)!=null){
+			dp.p_cp.wrongMessage("Variable déjà déclarée");
+		} else {
+			try{
+				env.addVariable(varName);
+			} catch(Exception e) {
+				throw new Exception();
+			}
 		}
 	} 
 }
@@ -109,7 +120,8 @@ class Assignment extends Instruction {
 	public void exec(ValueEnvironment env, DrawPanel dp)
 	throws Exception {
 		try{
-			env.setVariable(varName, exp.eval(env));
+			env.setVariable(varName, exp.eval(env, dp));
+			dp.p_cp.correctMessage("Assignement complete");
 		} catch(Exception e) {
 			throw new Exception();
 		}
@@ -122,7 +134,8 @@ class Move extends Instruction {
 		exp = e;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		dp.move(exp.eval(env));
+		dp.move(exp.eval(env, dp));
+		dp.p_cp.correctMessage("Moved");
 	}
 }
 
@@ -132,8 +145,9 @@ class Turn extends Instruction {
 		exp = e;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		dp.setAngle(exp.eval(env));
-		dp.turnAngle();
+		//dp.setAngle();
+		dp.turnAngle(exp.eval(env, dp));
+		dp.p_cp.correctMessage("Turned");
 	}
 }
 
@@ -144,7 +158,8 @@ class Color extends Instruction {
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		//setColor pas encore définie
-		dp.setColor(exp.eval(env));
+		dp.setColor((int)exp.eval(env, dp));
+		dp.p_cp.correctMessage("Color changed");
 	}
 }
 
@@ -154,7 +169,22 @@ class Size extends Instruction {
 		exp = e;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		dp.setSize(exp.eval(env));
+		dp.setSize((int)exp.eval(env, dp));
+		dp.p_cp.correctMessage("Size changed");
+	}
+}
+
+class If extends Instruction {
+	private Expression exp;
+	private Instruction inst;
+	public If(Expression e, Instruction i){
+		exp=e;
+		inst=i;
+	}
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
+		if(exp.eval(env, dp)==0){
+			inst.exec(env, dp);
+		}
 	}
 }
 
@@ -168,10 +198,28 @@ class IfElse extends Instruction {
 		alt=a;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		if(exp.eval(env)==0){
+		if(exp.eval(env, dp)==0){
 			inst.exec(env, dp);
 		} else {
 			alt.exec(env, dp);
+		}
+	}
+}
+
+class For extends Instruction {
+	private Expression exp;
+	private Instruction inst;
+	public For(Expression e, Instruction i){
+		exp=e;
+		inst=i;
+	}
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
+		if(exp.eval(env, dp)>0){
+			for(int i=0; i<exp.eval(env, dp); i++){
+				inst.exec(env, dp);
+			}
+		} else {
+			dp.p_cp.correctMessage("Condition de boucle POUR non valide (inférieure ou égale à 0)");
 		}
 	}
 }
@@ -184,7 +232,7 @@ class While extends Instruction {
 		inst=i;
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
-		while(exp.eval(env)!=0){
+		while(exp.eval(env, dp)!=0){
 			inst.exec(env, dp);
 		}
 	}
@@ -197,6 +245,11 @@ class Position extends Instruction {
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		dp.setCanDraw(this.canDraw);
+		if(canDraw){
+			dp.p_cp.correctMessage("Pinceau baissé");
+		} else {
+			dp.p_cp.correctMessage("Pinceau relevé");
+		}
 	}
 }
 
@@ -234,19 +287,19 @@ class BlocDecl{
 	}
 }
 
-class ValueEnvironment extends HashMap<String, Integer> {
+class ValueEnvironment extends HashMap<String, Double> {
 	public ValueEnvironment() {
 		super();
 	}
 	public void addVariable(String name) 
 	throws Exception {
-		this.put(name, 0);
+		this.put(name, 0.0);
 	}
-	public void setVariable(String name, int value) 
+	public void setVariable(String name, double value) 
 	throws Exception {
 		this.put(name, value);
 	}
-	public int getValue(String name) 
+	public double getValue(String name) 
 	throws Exception {
 		return this.get(name);
 	}

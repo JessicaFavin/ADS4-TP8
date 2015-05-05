@@ -25,6 +25,7 @@ public class DrawPanel extends JPanel {
 
     JScrollPane scroll;
     private HeadBar p_hb;
+    public ChatPanel p_cp;
     private Color color = Color.RED;
     private int currentX = 0;
     private int currentY = 0;
@@ -42,6 +43,7 @@ public class DrawPanel extends JPanel {
     //**************************************************************************
     public DrawPanel(HeadBar hb) {
         this.p_hb = hb;
+        this.p_cp = null;
         scroll = new JScrollPane(this);
         this.setPreferredSize(new Dimension(800, 600));
         currentY = 600;
@@ -76,18 +78,18 @@ public class DrawPanel extends JPanel {
         repaint();
     }
 
-    public void move(int length) {
+    public void move(double length) {
         if (canDraw) {
             drawLine(length);
             repaint();
         } else {
-            currentX += (int) (length * Math.cos(angle));
-            currentY += (int) (length * Math.sin(angle));
+            currentX += (double) (length * Math.cos(angle));
+            currentY += (double) (length * Math.sin(angle));
             repaint();
         }
     }
 
-    public void drawLine(int length) {
+    public void drawLine(double length) {
         Point a = new Point(0, 0);
         Point b = new Point(0, 0);
         a.x = currentX;
@@ -110,6 +112,12 @@ public class DrawPanel extends JPanel {
         p_hb.l_angle.setText((int)(Math.toDegrees(angle)) + " deg");
 
         System.out.println("Angle : " + angle + " rad");
+    }
+    
+    public void turnAngle(double deg){
+    	double rad = Math.toRadians(deg);
+    	angle -= rad;
+    	angle = angle % (2*Math.PI);
     }
 
     public void pickColor() {
@@ -164,6 +172,9 @@ public class DrawPanel extends JPanel {
     //**************************************************************************
     // SETTERS / GETTERS
     //**************************************************************************
+    public void setChat(ChatPanel cp){
+    	this.p_cp = cp;
+    }
     public void setPointerColor(Color c) {
         this.color = c;
         p_hb.p_color.setBackground(c);
