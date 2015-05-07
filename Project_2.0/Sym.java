@@ -8,8 +8,6 @@ public enum Sym {
 	DEBUT,
 	FIN,
 	EOF,
-	EOL,
-	STOP,
 	EQ,
 	PLUS,
 	MINUS,
@@ -27,5 +25,7 @@ public enum Sym {
 	POUR,
 	TOURS,
 	TOURNE,
-	AVANCE;
+	AVANCE,
+	MODE,
+	SAVE;
 }

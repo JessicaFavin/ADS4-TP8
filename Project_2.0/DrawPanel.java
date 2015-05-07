@@ -30,12 +30,14 @@ public class DrawPanel extends JPanel {
     private int currentX = 0;
     private int currentY = 0;
     private boolean canDraw = false;
+    private boolean mode90 = false;
     private boolean erasing = true;
+    private boolean save = false;
     private int size = 5;
     private double angle = -Math.PI/2;
     private double angle2 = Math.PI / 8;
     private ArrayList<Line> lines = new ArrayList<Line>();
-
+	private int cmptSave = 0;
     int temp = 1;
 
     //**************************************************************************
@@ -46,7 +48,7 @@ public class DrawPanel extends JPanel {
         this.p_cp = null;
         scroll = new JScrollPane(this);
         this.setPreferredSize(new Dimension(800, 600));
-        currentY = 600;
+        currentY = 700;
     }
 
     //**************************************************************************
@@ -66,8 +68,14 @@ public class DrawPanel extends JPanel {
             g2d.setStroke(new BasicStroke(l.getSize(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g2d.drawLine(l.getPointA().x, l.getPointA().y, l.getPointB().x, l.getPointB().y);
         }
-        g2d.setColor(color);
-        g2d.drawOval(currentX - 5, currentY - 5, 10, 10);
+        
+        if (!save) {
+            g2d.setColor(color);
+            g2d.drawOval(currentX - 5, currentY - 5, 10, 10);
+            
+            g2d.setColor(Color.BLACK);
+            g2d.drawLine(currentX, currentY, (int) (10* Math.cos(angle)) + currentX, (int) (10* Math.sin(angle)) + currentY);
+        }
 
     }
 
@@ -114,10 +122,17 @@ public class DrawPanel extends JPanel {
         System.out.println("Angle : " + angle + " rad");
     }
     
-    public void turnAngle(double deg){
+    public void turnAngle(double deg) throws Exception {
+    	if(mode90&&deg%90!=0){
+    		System.out.println("Erreur, angle non multiple de 90 en mode 90");
+    		throw new Exception();
+    	} else {
     	double rad = Math.toRadians(deg);
-    	angle -= rad;
-    	angle = angle % (2*Math.PI);
+			angle -= rad;
+			angle = angle % (2*Math.PI);
+			p_hb.l_angle.setText((int) Math.abs(Math.toDegrees(angle)) + " deg");
+		    repaint();
+        }
     }
 
     public void pickColor() {
@@ -159,11 +174,16 @@ public class DrawPanel extends JPanel {
     }
 
     void takePicture(JPanel panel) {
-        System.out.println("SAVE png");
+        save = true;
+        repaint();
+        System.out.println("Saved png");
         BufferedImage img = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
         panel.print(img.getGraphics());
         try {
-            ImageIO.write(img, "png", new File("panel.png"));
+            ImageIO.write(img, "png", new File("panel" + cmptSave + ".png"));
+            cmptSave++;
+            save = false;
+            repaint();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -175,9 +195,19 @@ public class DrawPanel extends JPanel {
     public void setChat(ChatPanel cp){
     	this.p_cp = cp;
     }
+    
     public void setPointerColor(Color c) {
         this.color = c;
         p_hb.p_color.setBackground(c);
+    }
+    
+    public void setMode(boolean b){
+    	this.mode90 = b;
+    	if(b){
+        	p_hb.l_mode.setText("Activé");
+        } else {
+        	p_hb.l_mode.setText("Désactivé");
+        }
     }
 
     public void setAngle(int angleDeg) {
@@ -188,11 +218,17 @@ public class DrawPanel extends JPanel {
 
     public void setCanDraw(boolean b) {
         this.canDraw = b;
+        if(b){
+        	p_hb.l_status.setText("DOWN");
+        } else {
+        	p_hb.l_status.setText("UP");
+        }
     }
 
     public void setSize(int x) {
         this.size = x;
         p_hb.l_taille.setText(String.valueOf(size) + " px");
+        repaint();
     }
     
     public void setColor(int value) {
@@ -231,6 +267,7 @@ public class DrawPanel extends JPanel {
                 break;
         }
         p_hb.p_color.setBackground(color);
+        repaint();
     }
 
 }

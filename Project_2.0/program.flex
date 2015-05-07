@@ -14,8 +14,7 @@
 	LexerException
 %yylexthrow}
 
-blank = [\t ]
-line = [\n\r\f]
+blank = [\t\n\r\f ]
 int   = [1-9][0-9]*[.]*[0-9]* | 0
 variable = [a-z][a-zA-Z]*
 
@@ -42,6 +41,8 @@ variable = [a-z][a-zA-Z]*
  "POUR"			{return new Token(Sym.POUR);}
  "TOUR"			{return new Token(Sym.TOURS);}
  "TOURS"		{return new Token(Sym.TOURS);}
+ "MODE"			{return new Token(Sym.MODE);}
+ "SAUVEGARDE"	{return new Token(Sym.SAVE);}
  "="			{return new Token(Sym.EQ);}
  ";"			{return new Token(Sym.CONCAT);}
  "+"			{return new Token(Sym.PLUS);}
@@ -53,7 +54,6 @@ variable = [a-z][a-zA-Z]*
    
  {blank}	   	{}
  
- {line}			{return new Token(Sym.EOL);}
- "STOP"	   		{return new Token(Sym.STOP);}
+ <<EOF>>	   	{return new Token(Sym.EOF);}
  [^]		   	{System.out.println(yytext()); throw new LexerException(yyline, yycolumn);}
 }

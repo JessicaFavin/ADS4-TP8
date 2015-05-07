@@ -28,10 +28,10 @@ class Parser {
     }   
     
     //Code -> Prog STOP
-    public void nontermCode() throws Exception {
+    public Instruction nontermCode() throws Exception {
         Instruction prog = nontermProg();
         //prog.run(env, dp);
-        //return prog;
+        return prog;
     }
     
     //Prog -> Decl Inst
@@ -43,7 +43,8 @@ class Parser {
     	reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||
     	reader.check(Sym.HAUT)||reader.check(Sym.BAS)
     	||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)
-    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)||reader.check(Sym.POUR)){
+    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)
+    	||reader.check(Sym.POUR)||reader.check(Sym.MODE)||reader.check(Sym.SAVE)){
     		Instruction inst = nontermInst();
     		return inst;
     	
@@ -71,7 +72,7 @@ class Parser {
 
     //Inst -> var = Exp; EOL | DEBUT BlocInst FIN EOL | AVANCE Exp; EOL | TOURNE Exp; EOL | HAUTPINCEAU; EOL | BASPINCEAU; EOL
     //  | COULEUR Exp; EOL | EPAISSEUR Exp; EOL | SI Exp EOL ALORS Inst EOL InstSuite EOL | TANT QUE Exp EOL FAIRE Inst 
-    //  | POUR Exp TOURS EOL Inst
+    //  | POUR Exp TOURS EOL Inst | MODE Exp; | SAVE;
     public Instruction nontermInst() throws Exception {
     	if(reader.check(Sym.VARIABLE)){
 			String nomVar = reader.getStringValue();
@@ -82,13 +83,13 @@ class Parser {
 			Assignment a = new Assignment(nomVar, exp);
 			a.exec(env, dp);
 			return a;
-			/*
+			
     	} else if(reader.check(Sym.DEBUT)) {
 			term(Sym.DEBUT);
 			BlocInst bloc = nontermBlocInst();
 			term(Sym.FIN);
 			return bloc;
-			*/
+			
     	} else if(reader.check(Sym.AVANCE)) {
 			term(Sym.AVANCE);
 			Expression exp = nontermExp();
@@ -136,11 +137,24 @@ class Parser {
     		Expression exp = nontermExp();
     		term(Sym.ALORS);
     		Instruction inst = nontermInst();
-    		If si = new If(exp, inst);
-    		si.exec(env, dp);
-    		return si;
-    		//return nontermInstSuite(exp, inst);
-    		/*
+    		//If si = new If(exp, inst);
+    		//si.exec(env, dp);
+    		Instruction s = nontermInstSuite(exp, inst);
+    		s.exec(env, dp);
+    		return s;
+    	} else if(reader.check(Sym.MODE)){
+			term(Sym.MODE);
+			Expression exp= nontermExp();
+			term(Sym.CONCAT);
+			Mode m = new Mode(exp);
+			m.exec(env, dp);
+			return m;
+		} else if(reader.check(Sym.SAVE)){
+			term(Sym.SAVE);
+			term(Sym.CONCAT);
+			Save s = new Save();
+			s.exec(env, dp);
+			return s;
     	} else if(reader.check(Sym.TANTQUE)){
     		term(Sym.TANTQUE);
     		Expression exp = nontermExp();
@@ -157,31 +171,28 @@ class Parser {
 			For f = new For(exp, inst);
 			f.exec(env, dp);
 			return f;
-			*/
+			
     	} else {
 			dp.p_cp.wrongMessage("Erreur Instruction");
 			throw new Exception();
     	}
     }
-/*
+
     public Instruction nontermInstSuite(Expression exp, Instruction inst) throws Exception {
-		if(reader.check(Sym.SINON)) {
+    	if(reader.current()==null){
+    		If si = new If(exp, inst);
+    		si.exec(env, dp);
+			return si;
+		} else if(reader.check(Sym.SINON)) {
 			term(Sym.SINON);
     		Instruction alt = nontermInst();
     		IfElse sinon = new IfElse(exp, inst, alt);
     		sinon.exec(env, dp);
     		return sinon;
-		} else if(reader.check(Sym.VARIABLE)||reader.check(Sym.DEBUT)||
-    	reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||
-    	reader.check(Sym.HAUT)||reader.check(Sym.BAS)
-    	||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)
-    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)||reader.check(Sym.POUR)){
-    		If si = new If(exp, inst);
-    		si.exec(env, dp);
-			return si;
-    	} else {
-			throw new ParserException("Erreur InstructionSuite", this.pos);
-    	}
+		} else {
+			dp.p_cp.wrongMessage("Erreur InstructionSuite");
+			throw new Exception();
+		}
     }
 
     //BlocInst -> Inst; BlocInst | e
@@ -190,7 +201,8 @@ class Parser {
     	reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||
     	reader.check(Sym.HAUT)||reader.check(Sym.BAS)
     	||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)
-    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)||reader.check(Sym.POUR)){
+    	||reader.check(Sym.SI)||reader.check(Sym.TANTQUE)
+    	||reader.check(Sym.POUR)||reader.check(Sym.MODE)||reader.check(Sym.SAVE)){
 			Instruction inst = nontermInst();
 			BlocInst bloc = nontermBlocInst();
 			return new BlocInst(inst, bloc);
@@ -202,7 +214,7 @@ class Parser {
 			}
     	}
     }
-*/
+
     //Exp -> int ExpSuite | var ExpSuite | (Exp) ExpSuite
     public Expression nontermExp() throws Exception {
     	if(reader.check(Sym.INT)){

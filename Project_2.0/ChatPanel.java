@@ -36,18 +36,19 @@ import javax.swing.text.StyledDocument;
  * @author  Jessica FAVIN
  */
 public class ChatPanel extends JPanel {
-    private     JPanel          p_sentence;
-    private     JPanel          p_north;
-    private     JTextField      tf_sentence;
-    private     JTextPane       tp_chat;
-    private     JScrollPane     sp_scroll;
-    private     StyledDocument  sd_chat;
-    private     JPanel          p_correct;
-    private     JLabel          l_correct;
+    private     JPanel          	p_sentence;
+    private     JPanel          	p_north;
+    private     JTextField      	tf_sentence;
+    private     JTextPane       	tp_chat;
+    private     JScrollPane     	sp_scroll;
+    private     StyledDocument  	sd_chat;
+    private     JPanel          	p_correct;
+    private     JLabel          	l_correct;
+    private		ValueEnvironment 	env ;
+    private 	String				beginning;
+    private		int					inBloc 		= 0;
     
-    private		String			last;
-    
-    private     DrawPanel       dp;
+    private     DrawPanel       	dp;
     Icon icon = new ImageIcon("src/turtledraw/checked.png");
     Icon icon2 = new ImageIcon("src/turtledraw/cross.png");
     
@@ -89,7 +90,8 @@ public class ChatPanel extends JPanel {
         sd_chat             = tp_chat.getStyledDocument();
         p_north             .setLayout(new BorderLayout());
         this                .setLayout(new BorderLayout());
-        last = "";
+        env 				= new ValueEnvironment();
+        beginning 			= "";
         setupChat();
     }
 
@@ -101,7 +103,7 @@ public class ChatPanel extends JPanel {
         //ta_chat.setLineWrap(true);
         tp_chat.setEditable(false);
         sp_scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        p_correct.setBackground(Color.GRAY);
+        p_correct.setBackground(Color.LIGHT_GRAY);
         l_correct.setForeground(Color.BLACK);
         
     }
@@ -134,6 +136,46 @@ public class ChatPanel extends JPanel {
         p_correct.setBackground(Color.RED);
         l_correct.setForeground(Color.WHITE);
     }
+    
+    public void execParser(String str){
+    	Reader reader = new StringReader(str);
+		Lexer lexer = new Lexer(reader);
+		try{
+			LookAhead1 look = new LookAhead1(lexer);
+		
+			try{
+				Parser parser = new Parser(look, env, dp);
+				Instruction prog = parser.nontermCode();
+				dp.repaint();
+			} catch (Exception ex){
+				ex.printStackTrace();
+				wrongMessage("Error in instruction");
+			}
+		} catch(Exception exp) {
+			wrongMessage("Not a valid instruction");
+		}
+    }
+    
+    public void execParserFile(String str){
+    	
+        File input = new File(str);
+        try{
+			Reader reader = new FileReader(input);
+			
+		     
+			ValueEnvironment en = new ValueEnvironment();
+			Lexer lexer = new Lexer(reader);
+			LookAhead1 look = new LookAhead1(lexer);
+			ParserFile parser = new ParserFile(look, en, dp);
+			Program prog = parser.nontermCode();
+			prog.run(en, dp);
+			
+		} catch(FileNotFoundException ex){
+			ex.printStackTrace();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+    }
 
     //Peut être à changer un peu pour eviter d'appuyer sur enter par erreur
     public void setActions() {
@@ -142,71 +184,142 @@ public class ChatPanel extends JPanel {
                 public void keyPressed(KeyEvent e) {
                     int key = e.getKeyCode();
                     if (key == KeyEvent.VK_ENTER) {
-                        try {
-                            String sentence = tf_sentence.getText();
-                            //last = sentence;
-                            tp_chat.setText(tp_chat.getText()+ " "+sentence+"\n");
-                            
-                            sd_chat = (StyledDocument)tp_chat.getDocument();
-                            Style style = sd_chat.addStyle("StyleName", null);
-                            sd_chat.insertString(sd_chat.getLength(), "ignored text", style);
-                            
-                            tf_sentence.setText("");
-                            
-                            Reader reader = new StringReader(sentence);
-							Lexer lexer = new Lexer(reader);
-							try{
-								LookAhead1 look = new LookAhead1(lexer);
-								ValueEnvironment env = new ValueEnvironment();
-								try{
-									Parser parser = new Parser(look, env, dp);
-								} catch (Exception ex){
-									wrongMessage("An error occurred");
-								}
-							} catch(Exception exp) {
-								wrongMessage("poop");
-							}
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(ChatPanel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    else if (key == KeyEvent.VK_NUMPAD8){
                         String sentence = tf_sentence.getText();
                         tp_chat.setText(tp_chat.getText()+ " "+sentence+"\n");
                         tp_chat.setCaretPosition(tp_chat.getText().length());
                         tf_sentence.setText("");
-                        dp.move(50);
-                        correctMessage("Déplacement de 50");
-                    }
-                    else if (key == KeyEvent.VK_NUMPAD5){
-                        String sentence = tf_sentence.getText();
-                        tp_chat.setText(tp_chat.getText()+ " "+sentence+"\n");
-                        tp_chat.setCaretPosition(tp_chat.getText().length());
-                        tf_sentence.setText("");
-                        dp.pickColor();
-                        correctMessage("Nouvelle couleur");
-                    }
-                    
-                    else if (key == KeyEvent.VK_NUMPAD4){
-                        String sentence = tf_sentence.getText();
-                        tp_chat.setText(tp_chat.getText()+ " "+sentence+"\n");
-                        tp_chat.setCaretPosition(tp_chat.getText().length());
-                        tf_sentence.setText("");
-                        dp.turnAngle();
-                        correctMessage("Nouvel angle");
-                    }
-                    else if (key == KeyEvent.VK_NUMPAD1){
-                        String sentence = tf_sentence.getText();
-                        tp_chat.setText(tp_chat.getText()+ " "+sentence+"\n");
-                        tp_chat.insertIcon(icon);
-                        tp_chat.setCaretPosition(tp_chat.getText().length());
-                        tf_sentence.setText("");
-                        dp.takePicture(dp);
-                        correctMessage("Image Saved");
-                    }
-                    else{
-                        wrongMessage("Erreur");
-                    }
+                        
+                        /*
+                        if(inBloc){
+                        	if(sentence.startsWith(FIN)){
+                        		beginning = beginning.concat(" ").concat(sentence);
+                        		execParser(beginning);
+                        		beginning = "";
+		                    }else{
+		                    	beginning = beginning.concat(" ").concat(sentence);
+			                	correctMessage("Instruction saved");
+	                    	}
+                        } else if(sentence.equals("")){
+                        	wrongMessage("Not a valid instruction");
+                        } else if(sentence.startsWith("SI")){
+                        	if(beginning.equals("")){
+                        		if(sentence.startsWith("SINON")){
+                        			wrongMessage("Not valid with the previous instruction");
+                        		} else if(sentence.endsWith(";")){
+                        			//should not check the end onforward but let the parser tell about it
+                        			//also should put the concat where??
+                        			//like they said in between instructions in blocInstruction??
+                        			wrongMessage("Not a valid instruction");
+                        		} else {
+	                    			beginning = beginning.concat(" ").concat(sentence);
+	                    			correctMessage("Beginning of instruction saved");
+	                    			System.out.println("debut instr"+beginning);
+                        		}
+                        	} else {
+                        		if(sentence.startsWith("SINON")){
+                    				System.out.println(" SINON debut instr"+beginning);
+					            	if(beginning.equals("")){
+					            		wrongMessage("Not valid with the previous instruction");
+					            	} else {
+					            		if(sentence.endsWith(";")){
+					            			System.out.println("exec SINON "+beginning.concat(" ").concat(sentence));
+					            			execParser(beginning.concat(" ").concat(sentence));
+					            			beginning="";
+					            		} else {
+					            			wrongMessage("Not a valid instruction");
+					            		}
+					            	}
+                    			} else {
+                        			wrongMessage("Not valid with the previous instruction");
+                        		}
+                        	}
+                        } else if(sentence.startsWith("ALORS")){
+                        	if(beginning.equals("")){
+                        		wrongMessage("Not valid with the previous instruction");
+                        	} else {
+                        		if(sentence.endsWith(";")){
+                        			execParser(beginning.concat(" ").concat(sentence));
+                        			beginning="";
+                        		} else {
+                        			beginning = beginning.concat(" ").concat(sentence);
+                        			correctMessage("Beginning of instruction saved");
+                        			System.out.println("debut instr"+beginning);
+                        		}
+                        	}
+                        } else if(sentence.startsWith("FAIRE")){
+                        	if(beginning.equals("")){
+                        		if(sentence.endsWith(";")){
+                        			wrongMessage("Not a valid instruction");
+                        		} else {
+                        			beginning = beginning.concat(" ").concat(sentence);
+                        			correctMessage("Beginning of instruction saved");
+                        		}
+                        	} else {
+                        		wrongMessage("Not valid with the previous instruction");
+                        	}
+                        } else if(sentence.startsWith("TANT")){
+                        	if(beginning.equals("")){
+                        		wrongMessage("Not a valid instruction");
+                        	} else {
+                        		if(sentence.endsWith(";")){
+                        			execParser(beginning.concat(" ").concat(sentence));
+                        			beginning="";
+                        		} else {
+                        			wrongMessage("Not a valid instruction");
+                        		}
+                        	
+                        	}
+                        } else if(sentence.startsWith("POUR")){
+                        	if(beginning.equals("")){
+                        		if(sentence.endsWith(";")){
+                        			wrongMessage("Not a valid instruction");
+                        		} else {
+                        			beginning = beginning.concat(" ").concat(sentence);
+                        			correctMessage("Beginning of instruction saved");
+                        		}
+                        	} else {
+                        		wrongMessage("Not valid with the previous instruction");
+                        	}
+                        } else if(sentence.startsWith("TOUR")){
+                        	if(beginning.equals("")){
+                        		wrongMessage("Not valid with the previous instruction");
+                        	} else {
+                        		if(sentence.endsWith(";")){
+                        			execParser(beginning.concat(" ").concat(sentence));
+                        			beginning="";
+                        		} else {
+                        			wrongMessage("Not a valid instruction");
+                        		}
+                        	}
+                        } else */
+                        if(inBloc>0){
+                        	if(sentence.startsWith("FIN")){
+                        		beginning = beginning.concat(" ").concat(sentence);
+                        		inBloc--;
+                        		if(inBloc==0){
+                        			System.out.println(beginning);
+                        			execParser(beginning);
+		                    		beginning="";
+                        		}
+                        		
+		                    }else if (sentence.startsWith("DEBUT")){
+		                    		beginning = beginning.concat(" ").concat(sentence);
+		                    		inBloc++;
+		                    		correctMessage("Début bloc d'instruction "+inBloc);
+		                    } else {
+		                    	beginning = beginning.concat(" ").concat(sentence);
+			                	correctMessage("Instruction saved");
+	                    	}
+                        }else if (sentence.startsWith("DEBUT")){
+                        	beginning = beginning.concat(" ").concat(sentence);
+                        	inBloc++;
+                        	correctMessage("Début bloc d'instruction "+inBloc);
+                        } else {
+                        	beginning = beginning.concat(" ").concat(sentence);
+		                    execParser(beginning);
+		                    beginning="";
+						}
+					}
                 }
 
                 public void keyReleased(KeyEvent e) {
@@ -218,7 +331,4 @@ public class ChatPanel extends JPanel {
         );
     }
     
-    public String getLast(){
-    	return last;
-    }
 }

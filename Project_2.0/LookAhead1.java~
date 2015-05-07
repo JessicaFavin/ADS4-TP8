@@ -23,13 +23,14 @@ class LookAhead1  {
 	/* consumes a token of type s from the stream,
 	   exception when the contents does not start on s.   */
 	if (!check(s)) {
-	    //throw new Exception("\nCan't eat "+s+" current being "+current);
-	    throw new ReadException(s,current);
+	    throw new Exception("\nCan't eat "+s+" current being "+current);
+	    //throw new ReadException(s,current);
 	}
 		//for debug
-		//System.out.println(current);
+		System.out.println(current);
 		
         current=lexer.yylex();
+        System.out.println("(Suivant = "+current);
     }
     
     public double getIntValue()
@@ -59,6 +60,10 @@ class LookAhead1  {
     }
     
     public Sym getCurrent(){
+    	return current.symbol();
+    }
+    
+    public Token current(){
     	return current;
     }
 

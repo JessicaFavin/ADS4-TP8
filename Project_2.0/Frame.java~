@@ -41,7 +41,7 @@ public class Frame extends JFrame{
         p_hb   = new HeadBar();
         p_draw = new DrawPanel(p_hb);
         p_chat = new ChatPanel(p_draw);
-        
+        p_draw.setChat(p_chat);
     }
     
     private void addEachComponents(){

@@ -62,7 +62,7 @@ class Division extends Expression {
 		//Division par 0
 		if(right.eval(env, dp)==0){
 			dp.p_cp.wrongMessage("Erreur division par 0!!");
-			throw Exception("Erreur division par 0!!");
+			throw new Exception("Erreur division par 0!!");
 			
 		} else {
 			return left.eval(env, dp)/right.eval(env, dp);
@@ -100,10 +100,11 @@ class Declaration extends Instruction {
 	public void exec(ValueEnvironment env, DrawPanel dp) 
 	throws Exception {
 		if(env.get(varName)!=null){
-			dp.p_cp.wrongMessage("Variable déjà déclarée");
+			dp.p_cp.wrongMessage("Variable already declared!");
 		} else {
 			try{
 				env.addVariable(varName);
+				dp.p_cp.correctMessage("Variable declared");
 			} catch(Exception e) {
 				throw new Exception();
 			}
@@ -136,6 +137,28 @@ class Move extends Instruction {
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		dp.move(exp.eval(env, dp));
 		dp.p_cp.correctMessage("Moved");
+	}
+}
+
+class Mode extends Instruction {
+	private Expression exp;
+	public Mode(Expression e){
+		exp = e;
+	}
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
+		if(exp.eval(env, dp)==90){
+			dp.setMode(true);
+		} else {
+			dp.setMode(false);
+		}
+	}
+}
+
+class Save extends Instruction {
+	public Save(){
+	}
+	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
+		dp.takePicture(dp);
 	}
 }
 
@@ -293,14 +316,19 @@ class ValueEnvironment extends HashMap<String, Double> {
 	}
 	public void addVariable(String name) 
 	throws Exception {
+		System.out.println("Add var");
 		this.put(name, 0.0);
 	}
 	public void setVariable(String name, double value) 
 	throws Exception {
+		System.out.println("Set var");
 		this.put(name, value);
 	}
 	public double getValue(String name) 
 	throws Exception {
+		if(this.get(name)==null){
+			throw new Exception("Variable non déclarée");
+		}
 		return this.get(name);
 	}
 }
