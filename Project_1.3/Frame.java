@@ -28,7 +28,7 @@ public class Frame extends JFrame{
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setTitle("TurtleDraw");
         this.getContentPane().setLayout(new BorderLayout());
-        this.setVisible(false);
+        this.setVisible(true);
         this.initComponents();
         this.addEachComponents();
         this.validate();

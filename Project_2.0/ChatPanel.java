@@ -171,9 +171,9 @@ public class ChatPanel extends JPanel {
 			prog.run(en, dp);
 			
 		} catch(FileNotFoundException ex){
-			ex.printStackTrace();
+			wrongMessage("Fichier introuvable");
 		} catch(Exception e){
-			e.printStackTrace();
+		
 		}
     }
 

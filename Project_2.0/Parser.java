@@ -210,7 +210,8 @@ class Parser {
     		if(reader.check(Sym.FIN)){
 				return null;
 			} else {
-				throw new ParserException("Erreur BlocInst",this.pos);
+				dp.p_cp.wrongMessage("Erreur BlocInst");
+				throw new Exception();
 			}
     	}
     }
@@ -235,7 +236,8 @@ class Parser {
 			Expression expSuite = nontermExpS(exp);
 			return expSuite;
     	} else {
-			throw new ParserException("Erreur Expression",this.pos);
+    		dp.p_cp.wrongMessage("Erreur Expression");
+			throw new Exception();
     	}
     }
 
@@ -249,7 +251,9 @@ class Parser {
 		//in case of FOLLOW(ExpS) ie ExpS=e
 			return beginning;
 		} else {
-			throw new ParserException("Erreur ExpressionSuite"+reader.getString(),this.pos);
+			
+			dp.p_cp.wrongMessage("Erreur ExpresionSuite");
+			throw new Exception();
 		}
     }
 
@@ -272,7 +276,8 @@ class Parser {
 			Expression exp = nontermExp();
 			return new Division(beginning, exp);
     	} else {
-			throw new ParserException("Erreur Opérateur",this.pos);
+    		dp.p_cp.wrongMessage("Erreur Opérateur");
+			throw new Exception();
     	}
     }
     
@@ -288,7 +293,8 @@ class Parser {
 			reader.eat(symbol);
 			pos++;
 		}catch(ReadException e){
-			throw new ParserException("waiting for \""+e.getExpected()+"\" found \""+e.getFound()+"\"",this.pos);
+			dp.p_cp.wrongMessage("Erreur "+e.getExpected()+" non reconnu");
+			throw new ParserException("waiting for \""+e.getExpected()+"\" found \""+e.getFound()+"\"");
 		}
 	}
 }

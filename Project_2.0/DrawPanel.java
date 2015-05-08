@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import java.text.DecimalFormat;
 
 /**
  * @date 11 avr. 2015
@@ -127,10 +128,12 @@ public class DrawPanel extends JPanel {
     		System.out.println("Erreur, angle non multiple de 90 en mode 90");
     		throw new Exception();
     	} else {
-    	double rad = Math.toRadians(deg);
+    		DecimalFormat df = new DecimalFormat("0.00");
+    		double rad = Math.toRadians(deg);
 			angle -= rad;
 			angle = angle % (2*Math.PI);
-			p_hb.l_angle.setText((int) Math.abs(Math.toDegrees(angle)) + " deg");
+			//p_hb.l_angle.setText(df.format(Math.toDegrees(angle)) + " deg");
+			p_hb.l_angle.setText(df.format(angle) + " rad");
 		    repaint();
         }
     }

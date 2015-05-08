@@ -16,7 +16,6 @@ class ParserFile {
      * Op -> + Exp | - Exp | * Exp | / Exp
 	 */
     protected LookAhead1 reader;
-    protected int pos;
     protected ValueEnvironment env;
     protected DrawPanel dp;
 
@@ -24,7 +23,6 @@ class ParserFile {
 	   reader = r;
 	   env = e;
 	   dp = d;
-	   pos = 0;
     }  
     
     public Program nontermCode() throws Exception {
@@ -40,7 +38,8 @@ class ParserFile {
 			Instruction inst = nontermInst();
 			return new Program(decl, inst);
     	} else {
-			throw new ParserException("Erreur Programme",this.pos);
+    		dp.p_cp.wrongMessage("Erreur Programme dans le fichier");
+			throw new Exception();
     	}
     }
 
@@ -56,7 +55,8 @@ class ParserFile {
 		} else if(reader.check(Sym.VARIABLE)||reader.check(Sym.DEBUT)||reader.check(Sym.AVANCE)||reader.check(Sym.TOURNE)||reader.check(Sym.BAS)||reader.check(Sym.HAUT)||reader.check(Sym.COULEUR)||reader.check(Sym.EPAISSEUR)||reader.check(Sym.MODE)){
 			return null;
 		} else {
-			throw new ParserException("Erreur Declarations",this.pos);
+			dp.p_cp.wrongMessage("Erreur Déclarations dans le fichier");
+			throw new Exception();
 		}
     }
 
@@ -128,7 +128,8 @@ class ParserFile {
 			term(Sym.CONCAT);
 			return new Mode(exp);
     	} else {
-			throw new ParserException("Erreur Instruction",this.pos);
+    		dp.p_cp.wrongMessage("Erreur Instructions dans le fichier");
+			throw new Exception();
     	}
     }
 
@@ -145,7 +146,8 @@ class ParserFile {
     	||reader.check(Sym.MODE)||reader.check(Sym.EOF)||reader.check(Sym.FIN)){
 			return new If(exp, inst);
     	} else {
-			throw new ParserException("Erreur InstructionSuite", this.pos);
+			dp.p_cp.wrongMessage("Erreur InstructionSuite dans le fichier");
+			throw new Exception();
     	}
     }
 
@@ -164,7 +166,8 @@ class ParserFile {
     		if(reader.check(Sym.FIN)){
 				return null;
 			} else {
-				throw new ParserException("Erreur BlocInst",this.pos);
+				dp.p_cp.wrongMessage("Erreur BlocInst dans le fichier");
+				throw new Exception();
 			}
     	}
     }
@@ -189,7 +192,8 @@ class ParserFile {
 			Expression expSuite = nontermExpS(exp);
 			return expSuite;
     	} else {
-			throw new ParserException("Erreur Expression",this.pos);
+    		dp.p_cp.wrongMessage("Erreur Expression dans le fichier");
+			throw new Exception();
     	}
     }
 
@@ -203,7 +207,8 @@ class ParserFile {
 		//in case of FOLLOW(ExpS) ie ExpS=e
 			return beginning;
 		} else {
-			throw new ParserException("Erreur ExpressionSuite"+reader.getString(),this.pos);
+			dp.p_cp.wrongMessage("Erreur ExpresionSuite dans le fichier");
+			throw new Exception();
 		}
     }
 
@@ -226,7 +231,8 @@ class ParserFile {
 			Expression exp = nontermExp();
 			return new Division(beginning, exp);
     	} else {
-			throw new ParserException("Erreur Opérateur",this.pos);
+    		dp.p_cp.wrongMessage("Erreur Opérateur dans le fichier");
+			throw new Exception();
     	}
     }
     
@@ -240,9 +246,9 @@ class ParserFile {
 		*/
 		try{
 			reader.eat(symbol);
-			pos++;
 		}catch(ReadException e){
-			throw new ParserException("waiting for \""+e.getExpected()+"\" found \""+e.getFound()+"\"",this.pos);
+			dp.p_cp.wrongMessage("Erreur "+e.getExpected()+" non reconnu dans le fichier");
+			throw new ParserException("waiting for \""+e.getExpected()+"\" found \""+e.getFound()+"\"");
 		}
 	}
 }

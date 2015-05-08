@@ -167,12 +167,8 @@ public class ChatPanel extends JPanel {
 			Lexer lexer = new Lexer(reader);
 			LookAhead1 look = new LookAhead1(lexer);
 			ParserFile parser = new ParserFile(look, en, dp);
-			System.out.println("flag");
 			Program prog = parser.nontermCode();
-			System.out.println("Pourquouaah?");
-			
-			System.out.println("Coucou");
-			//prog.run(en, dp);
+			prog.run(en, dp);
 			
 		} catch(FileNotFoundException ex){
 			ex.printStackTrace();
