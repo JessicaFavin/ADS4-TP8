@@ -106,8 +106,8 @@ public class DrawPanel extends JPanel {
         b.x = (int) (length * Math.cos(angle)) + a.x;
         b.y = (int) (length * Math.sin(angle)) + a.y;
 
-        System.out.print("Point A (" + a.x + "," + a.y + ")");
-        System.out.println("/ Point B (" + b.x + "," + b.y + ")");
+        //System.out.print("Point A (" + a.x + "," + a.y + ")");
+        //System.out.println("/ Point B (" + b.x + "," + b.y + ")");
 
         lines.add(new Line(a, b, size, color));
 
@@ -125,14 +125,20 @@ public class DrawPanel extends JPanel {
     
     public void turnAngle(double deg) throws Exception {
     	if(mode90&&deg%90!=0){
-    		System.out.println("Erreur, angle non multiple de 90 en mode 90");
-    		throw new Exception();
+    		p_cp.wrongMessage("Angle non multiple de 90");
     	} else {
     		DecimalFormat df = new DecimalFormat("0.00");
     		double rad = Math.toRadians(deg);
 			angle -= rad;
 			angle = angle % (2*Math.PI);
-			p_hb.l_angle.setText(df.format(Math.toDegrees(angle)) + " deg");
+			if(-1*Math.toDegrees(angle)>=0){
+				p_hb.l_angle.setText(df.format(-1*Math.toDegrees(angle)) + " deg");
+			} else {
+				p_hb.l_angle.setText(df.format(360-Math.toDegrees(angle)) + " deg");
+			}
+			
+			p_cp.correctMessage("Turned");
+			//p_hb.l_angle.setText(df.format(angle) + " rad");
 		    repaint();
         }
     }

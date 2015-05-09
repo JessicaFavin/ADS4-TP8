@@ -148,8 +148,10 @@ class Mode extends Instruction {
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		if(exp.eval(env, dp)==90){
 			dp.setMode(true);
+			dp.p_cp.correctMessage("Mode 90° activé");
 		} else {
 			dp.setMode(false);
+			dp.p_cp.correctMessage("Mode 90° désactivé");
 		}
 	}
 }
@@ -170,7 +172,6 @@ class Turn extends Instruction {
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		//dp.setAngle();
 		dp.turnAngle(exp.eval(env, dp));
-		dp.p_cp.correctMessage("Turned");
 	}
 }
 
@@ -316,14 +317,11 @@ class ValueEnvironment extends HashMap<String, Double> {
 	}
 	public void addVariable(String name) 
 	throws Exception {
-		System.out.println("Add var");
 		this.put(name, 0.0);
 	}
 	public void setVariable(String name, double value) 
 	throws Exception {
-		System.out.println("Set var");
 		this.put(name, value);
-		System.out.println(this.get(name));
 	}
 	public double getValue(String name) 
 	throws Exception {

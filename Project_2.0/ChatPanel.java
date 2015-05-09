@@ -48,7 +48,7 @@ public class ChatPanel extends JPanel {
     private 	String				beginning;
     private		int					inBloc 		= 0;
     
-    private     DrawPanel       	dp;
+    public     DrawPanel       	dp;
     Icon icon = new ImageIcon("src/turtledraw/checked.png");
     Icon icon2 = new ImageIcon("src/turtledraw/cross.png");
     
@@ -148,7 +148,6 @@ public class ChatPanel extends JPanel {
 				Instruction prog = parser.nontermCode();
 				dp.repaint();
 			} catch (Exception ex){
-				ex.printStackTrace();
 				wrongMessage("Error in instruction");
 			}
 		} catch(Exception exp) {
@@ -173,7 +172,7 @@ public class ChatPanel extends JPanel {
 		} catch(FileNotFoundException ex){
 			wrongMessage("Fichier introuvable");
 		} catch(Exception e){
-		
+			wrongMessage("Erreur dans le fichier");
 		}
     }
 
@@ -189,109 +188,6 @@ public class ChatPanel extends JPanel {
                         tp_chat.setCaretPosition(tp_chat.getText().length());
                         tf_sentence.setText("");
                         
-                        /*
-                        if(inBloc){
-                        	if(sentence.startsWith(FIN)){
-                        		beginning = beginning.concat(" ").concat(sentence);
-                        		execParser(beginning);
-                        		beginning = "";
-		                    }else{
-		                    	beginning = beginning.concat(" ").concat(sentence);
-			                	correctMessage("Instruction saved");
-	                    	}
-                        } else if(sentence.equals("")){
-                        	wrongMessage("Not a valid instruction");
-                        } else if(sentence.startsWith("SI")){
-                        	if(beginning.equals("")){
-                        		if(sentence.startsWith("SINON")){
-                        			wrongMessage("Not valid with the previous instruction");
-                        		} else if(sentence.endsWith(";")){
-                        			//should not check the end onforward but let the parser tell about it
-                        			//also should put the concat where??
-                        			//like they said in between instructions in blocInstruction??
-                        			wrongMessage("Not a valid instruction");
-                        		} else {
-	                    			beginning = beginning.concat(" ").concat(sentence);
-	                    			correctMessage("Beginning of instruction saved");
-	                    			System.out.println("debut instr"+beginning);
-                        		}
-                        	} else {
-                        		if(sentence.startsWith("SINON")){
-                    				System.out.println(" SINON debut instr"+beginning);
-					            	if(beginning.equals("")){
-					            		wrongMessage("Not valid with the previous instruction");
-					            	} else {
-					            		if(sentence.endsWith(";")){
-					            			System.out.println("exec SINON "+beginning.concat(" ").concat(sentence));
-					            			execParser(beginning.concat(" ").concat(sentence));
-					            			beginning="";
-					            		} else {
-					            			wrongMessage("Not a valid instruction");
-					            		}
-					            	}
-                    			} else {
-                        			wrongMessage("Not valid with the previous instruction");
-                        		}
-                        	}
-                        } else if(sentence.startsWith("ALORS")){
-                        	if(beginning.equals("")){
-                        		wrongMessage("Not valid with the previous instruction");
-                        	} else {
-                        		if(sentence.endsWith(";")){
-                        			execParser(beginning.concat(" ").concat(sentence));
-                        			beginning="";
-                        		} else {
-                        			beginning = beginning.concat(" ").concat(sentence);
-                        			correctMessage("Beginning of instruction saved");
-                        			System.out.println("debut instr"+beginning);
-                        		}
-                        	}
-                        } else if(sentence.startsWith("FAIRE")){
-                        	if(beginning.equals("")){
-                        		if(sentence.endsWith(";")){
-                        			wrongMessage("Not a valid instruction");
-                        		} else {
-                        			beginning = beginning.concat(" ").concat(sentence);
-                        			correctMessage("Beginning of instruction saved");
-                        		}
-                        	} else {
-                        		wrongMessage("Not valid with the previous instruction");
-                        	}
-                        } else if(sentence.startsWith("TANT")){
-                        	if(beginning.equals("")){
-                        		wrongMessage("Not a valid instruction");
-                        	} else {
-                        		if(sentence.endsWith(";")){
-                        			execParser(beginning.concat(" ").concat(sentence));
-                        			beginning="";
-                        		} else {
-                        			wrongMessage("Not a valid instruction");
-                        		}
-                        	
-                        	}
-                        } else if(sentence.startsWith("POUR")){
-                        	if(beginning.equals("")){
-                        		if(sentence.endsWith(";")){
-                        			wrongMessage("Not a valid instruction");
-                        		} else {
-                        			beginning = beginning.concat(" ").concat(sentence);
-                        			correctMessage("Beginning of instruction saved");
-                        		}
-                        	} else {
-                        		wrongMessage("Not valid with the previous instruction");
-                        	}
-                        } else if(sentence.startsWith("TOUR")){
-                        	if(beginning.equals("")){
-                        		wrongMessage("Not valid with the previous instruction");
-                        	} else {
-                        		if(sentence.endsWith(";")){
-                        			execParser(beginning.concat(" ").concat(sentence));
-                        			beginning="";
-                        		} else {
-                        			wrongMessage("Not a valid instruction");
-                        		}
-                        	}
-                        } else */
                         if(inBloc>0){
                         	if(sentence.startsWith("FIN")){
                         		beginning = beginning.concat(" ").concat(sentence);

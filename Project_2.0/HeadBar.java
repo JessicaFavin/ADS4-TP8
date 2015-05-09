@@ -39,6 +39,7 @@ public class HeadBar extends JPanel{
     public JLabel status = new JLabel("Pen :");
     public JLabel l_status = new JLabel("UP");
     public JButton b_UseFile = new JButton("Load File");
+    public JButton b_reset = new JButton("Effacer");
     public JLabel l_logo = new JLabel(new ImageIcon("logoTurtleDraw.png"));
     public JLabel l_sign = new JLabel(new ImageIcon("signature.png"));
     
@@ -80,6 +81,7 @@ public class HeadBar extends JPanel{
         p_mode.setBackground(Color.DARK_GRAY);
         
         b_UseFile.setPreferredSize(new Dimension(85, 26));
+        b_reset.setPreferredSize(new Dimension(85, 26));
         
         p_center.add(p_invisible);
         p_center.add(p_color);
@@ -88,6 +90,7 @@ public class HeadBar extends JPanel{
         p_center.add(p_status);
         p_center.add(p_mode);
         p_center.add(b_UseFile);
+        p_center.add(b_reset);
         setBtnActions();
         
         p_left.add(l_logo);
@@ -116,6 +119,13 @@ public class HeadBar extends JPanel{
         			
                 }
             }
+        });
+        
+        b_reset.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		p_cp.dp.erase();
+        		p_cp.correctMessage("Effacé");
+        	}
         });
     }
 
