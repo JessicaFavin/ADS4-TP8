@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
  * @author  Jessica FAVIN
  */
 public class DrawPanel extends JPanel {
+    //Taille du canevas =
 
     JScrollPane scroll;
     private HeadBar p_hb;
@@ -49,7 +50,7 @@ public class DrawPanel extends JPanel {
         this.p_cp = null;
         scroll = new JScrollPane(this);
         this.setPreferredSize(new Dimension(800, 600));
-        currentY = 700;
+        currentY = 731;
     }
 
     //**************************************************************************
@@ -80,6 +81,7 @@ public class DrawPanel extends JPanel {
 
     }
 
+
     //Efface le contenu
     public void erase() {
         this.erasing = true;
@@ -87,15 +89,34 @@ public class DrawPanel extends JPanel {
         repaint();
     }
 
-    public void move(double length) {
-        if (canDraw) {
-            drawLine(length);
-            repaint();
-        } else {
-            currentX += (double) (length * Math.cos(angle));
-            currentY += (double) (length * Math.sin(angle));
-            repaint();
+    public boolean isIn(double length){
+        double tempX = currentX;
+        double tempY = currentY;
+        tempX += (double) (length * Math.cos(angle));
+        tempY += (double) (length * Math.sin(angle));
+
+        if(tempY > 731 || tempY < 0 || tempX >935 || tempX < 0){
+            return false;
         }
+        return true;
+    }
+
+    public void move(double length) {
+        if(isIn(length)){
+            if (canDraw) {
+                drawLine(length);
+                repaint();
+            } else {
+                currentX += (double) (length * Math.cos(angle));
+                currentY += (double) (length * Math.sin(angle));
+                repaint();
+                p_cp.correctMessage("Avance de "+ (int)length);
+            }
+        }
+        else{
+            p_cp.wrongMessage("En dehors du canevas !");
+        }
+        
     }
 
     public void drawLine(double length) {

@@ -136,7 +136,7 @@ class Move extends Instruction {
 	}
 	public void exec(ValueEnvironment env, DrawPanel dp) throws Exception {
 		dp.move(exp.eval(env, dp));
-		dp.p_cp.correctMessage("Avancé");
+		//dp.p_cp.correctMessage("Avancé");
 	}
 }
 
